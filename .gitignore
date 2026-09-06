@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+._*
+
+# Claude Design canvas export — source material, not site content.
+# Keep it off the public repo (large base64 payloads + app-repo material).
+Designs/
+
+# Never. This repo is public and has no backend.
+.env
+.env.*
+*.pem
+node_modules/
+
+# Internal working notes — not for the public repo.
+docs/

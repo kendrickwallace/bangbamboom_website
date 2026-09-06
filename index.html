@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bang Bam Boom — a comic production studio in a browser</title>
+<meta name="description" content="From a one-line idea to a published issue: script, character design, spreads, art and lettering in one place. Join the waitlist.">
+<link rel="icon" href="images/logo-64.png" type="image/png">
+<link rel="apple-touch-icon" href="images/logo-256.png">
+<meta property="og:title" content="Bang Bam Boom">
+<meta property="og:description" content="A comic production studio in a browser. Write it. Design it. Create it.">
+<meta property="og:image" content="images/logo-512.png">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --ground:#14110E;
+  --panel:#1C1814;
+  --field:#241F19;
+  --rule:#322B22;
+  --ink:#EFE9E0;
+  --muted:#A99E90;
+  --dim:#857A6C;
+  --accent:#F07020;
+  --lift:#FFB27A;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+  --pad:48px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font:14px/1.5 var(--sans);
+  overflow-x:hidden;
+}
+img{max-width:100%}
+a{color:var(--accent)}
+a:hover{color:var(--lift)}
+
+.page{min-height:100vh;display:flex;flex-direction:column}
+
+/* ---------- header ---------- */
+.masthead{
+  height:56px;display:flex;align-items:center;gap:14px;
+  padding:0 var(--pad);border-bottom:2px solid var(--rule);flex:none;
+}
+.masthead img{width:40px;height:40px;display:block}
+.wordmark{font:700 15px var(--sans);letter-spacing:.02em;white-space:nowrap}
+.domain{font:11px var(--mono);color:var(--dim);margin-left:auto}
+
+/* ---------- hero ---------- */
+.hero{
+  display:grid;grid-template-columns:minmax(0,1.4fr) minmax(320px,400px);
+  border-bottom:2px solid var(--rule);
+}
+.hero-main{
+  padding:56px var(--pad) 48px;border-right:2px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;gap:32px;
+}
+.hero-mark{width:320px;height:auto;display:block}
+h1{
+  margin:0;font:700 clamp(32px,4.5vw,50px)/1.05 var(--sans);
+  letter-spacing:-.02em;text-align:center;text-wrap:balance;max-width:820px;
+}
+h1 .sub{color:var(--accent);font-weight:600}
+
+/* ---------- waitlist panel ---------- */
+.gate{
+  padding:48px 40px;background:var(--panel);
+  display:flex;flex-direction:column;justify-content:center;gap:20px;
+  scroll-margin-top:16px;
+  min-width:0;overflow:hidden;
+}
+.gate-title{font:600 22px/1.2 var(--sans);color:var(--accent);text-align:center}
+.gate-lede{font-size:17px;line-height:1.45;color:var(--ink);text-align:center;text-wrap:pretty}
+.gate-cta{
+  height:44px;display:flex;align-items:center;justify-content:center;
+  padding:0 16px;border:1px solid var(--accent);background:none;
+  color:var(--accent);font:600 16px var(--sans);text-decoration:none;
+  cursor:pointer;width:100%;
+}
+.gate-cta:hover{background:var(--accent);color:var(--ground)}
+.gate-note{font:11px var(--mono);color:var(--dim);text-align:center;line-height:1.5}
+.gate-done{font-size:17px;line-height:1.5;color:var(--ink);text-align:center;text-wrap:pretty}
+[hidden]{display:none !important}
+
+/* ---------- standfirst band ---------- */
+.band{
+  padding:40px var(--pad) 48px;display:flex;flex-direction:column;
+  align-items:center;gap:20px;border-bottom:2px solid var(--rule);
+}
+.eyebrow{
+  font:500 clamp(13px,1.6vw,18px) var(--mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);text-align:center;
+}
+.standfirst{
+  margin:0;font-size:17px;line-height:1.5;color:var(--muted);
+  max-width:640px;text-align:center;text-wrap:pretty;
+}
+
+/* ---------- five steps ---------- */
+.steps{
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:2px;background:var(--rule);border:2px solid var(--rule);
+  margin:0 var(--pad) 48px;
+}
+.step{background:var(--ground);display:flex;flex-direction:column;min-width:0}
+.step-head{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:12px 14px;border-bottom:1px solid var(--rule);
+}
+.step-n{font:700 12px var(--mono);color:var(--accent)}
+.step-price{font:11px var(--mono);color:var(--dim)}
+.step-shot{aspect-ratio:3/4;background:var(--field);display:block;width:100%;object-fit:contain}
+.step-body{padding:14px;display:flex;flex-direction:column;gap:6px}
+.step-title{font:600 15px var(--sans);color:var(--accent)}
+.step-desc{font-size:12.5px;line-height:1.45;color:var(--muted);text-wrap:pretty}
+
+/* ---------- promises ---------- */
+.promises{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  border-top:2px solid var(--rule);border-bottom:2px solid var(--rule);
+}
+.promise{padding:32px var(--pad);border-right:1px solid var(--rule)}
+.promise:last-child{border-right:0}
+.promise h2{margin:0;font:600 16px var(--sans);color:var(--accent)}
+.promise p{margin:8px 0 0;font-size:13px;line-height:1.5;color:var(--muted);text-wrap:pretty}
+
+/* ---------- data promises ---------- */
+.pledge{
+  padding:24px var(--pad);display:flex;gap:8px 32px;flex-wrap:wrap;
+  justify-content:center;border-bottom:2px solid var(--rule);
+  font-size:13px;line-height:1.5;color:var(--muted);text-align:center;
+}
+.pledge b{color:var(--ink);font-weight:600}
+
+/* ---------- footer ---------- */
+.foot{
+  padding:20px var(--pad);display:flex;justify-content:space-between;
+  align-items:center;gap:16px;flex-wrap:wrap;
+  font:11px var(--mono);color:var(--dim);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:1080px){
+  :root{--pad:32px}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hero{grid-template-columns:minmax(0,1fr) minmax(300px,360px)}
+}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero-main{border-right:0;border-bottom:2px solid var(--rule);padding-top:40px}
+  .hero-mark{width:240px}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .promise{border-right:0;border-bottom:1px solid var(--rule)}
+  .promise:last-child{border-bottom:0}
+}
+@media (max-width:620px){
+  :root{--pad:20px}
+  .wordmark{font-size:13px}
+  .domain{display:none}
+  .hero-mark{width:180px}
+  .steps{grid-template-columns:1fr;margin-bottom:32px}
+  .step-shot{aspect-ratio:4/3}
+  .gate{padding:32px 24px}
+  .foot{justify-content:center;text-align:center}
+}
+
+/* ---------- Clerk overrides ----------
+   Clerk ships its own card (background, border, shadow, fixed width) which
+   reads as a box inside the panel. Strip it so it sits *on* the panel.
+   Popovers/modals portal to <body>, so these must stay global rules. */
+.cl-rootBox,.cl-card,.cl-cardBox,.cl-main,.cl-form{
+  width:100% !important;max-width:100% !important;min-width:0 !important;
+  background:transparent !important;border:0 !important;
+  box-shadow:none !important;padding:0 !important;
+}
+/* Clerk's own title/subtitle duplicate the panel's own heading. */
+.cl-headerTitle,.cl-headerSubtitle{display:none !important}
+/* Belt-and-braces on the input: appearance variables have moved between
+   Clerk majors, so paint the field from our palette directly too. */
+.cl-formFieldInput{
+  background:var(--field) !important;color:var(--ink) !important;
+  border:1px solid var(--rule) !important;border-radius:0 !important;
+}
+.cl-formFieldLabel{color:var(--muted) !important}
+.cl-footer,.cl-footerAction,.cl-internal-uiRoot{background:transparent !important}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <img src="images/logo-64.png" alt="Bang Bam Boom">
+    <span class="wordmark">BANG BAM BOOM</span>
+    <span class="domain">bangbamboom.com</span>
+  </header>
+
+  <div class="hero">
+    <div class="hero-main">
+      <img class="hero-mark" src="images/logo-512.png" alt="" width="512" height="512">
+      <h1>Write it. Design it. Create it.<br><span class="sub">Your style, your story, your pages.</span></h1>
+    </div>
+
+    <div class="gate" id="join">
+      <div class="gate-title">Want early access?</div>
+
+      <!-- Intro + button. Clicking the button reveals the Clerk waitlist form
+           in place; this block is then hidden. -->
+      <div id="gate-intro" style="display:flex;flex-direction:column;gap:20px">
+        <div class="gate-lede">Create a free account to join the waitlist now!</div>
+        <button class="gate-cta" id="gate-open" type="button">Create a new account</button>
+      </div>
+
+      <!-- Clerk mounts here. -->
+      <div id="waitlist" hidden style="min-width:0"></div>
+
+      <!-- Shown after a successful join. -->
+      <div id="gate-done" class="gate-done" hidden>
+        <!-- TODO(Ken): final wording. Placeholder below. -->
+        Congratulations — we'll be in touch as soon as Bang Bam Boom is live.
+      </div>
+
+      <div class="gate-note" id="gate-fallback" hidden>
+        The waitlist form couldn't load. Please try again in a moment.
+      </div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="eyebrow">A comic production studio in a browser</div>
+    <p class="standfirst">From a one-line idea to a published issue: script, character design, spreads, art and lettering in one place. You approve every step, and every button tells you what it costs before you press it.</p>
+  </section>
+
+  <div class="steps">
+    <article class="step">
+      <div class="step-head"><span class="step-n">01</span><span class="step-price">free</span></div>
+      <img class="step-shot" src="images/step-01-script.webp" alt="The script editor, with a page-and-panel breakdown alongside the script" loading="lazy">
+      <div class="step-body">
+        <div class="step-title">Script</div>
+        <div class="step-desc">A one-line idea becomes a bible, a cast and a 24-page script you can edit line by line.</div>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step-head"><span class="step-n">02</span><span class="step-price">from $1.20</span></div>
+      <img class="step-shot" src="images/step-02-style.webp" alt="A style candidate: a character rendered in the approved look" loading="lazy">
+      <div class="step-body">
+        <div class="step-title">Style &amp; concept</div>
+        <div class="step-desc">Describe the look in plain words. Pick from candidates until the style holds across the whole book.</div>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step-head"><span class="step-n">03</span><span class="step-price">per character</span></div>
+      <img class="step-shot" src="images/step-03-character.webp" alt="A character model sheet: four turnaround views and six expressions" loading="lazy">
+      <div class="step-body">
+        <div class="step-title">Character sheets</div>
+        <div class="step-desc">Every cast member gets an approved model sheet — the reason faces stay the same on page 1 and page 24.</div>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step-head"><span class="step-n">04</span><span class="step-price">free</span></div>
+      <img class="step-shot" src="images/step-04-layout.webp" alt="The spread editor: panels, reading order and guides across two pages" loading="lazy">
+      <div class="step-body">
+        <div class="step-title">Layout</div>
+        <div class="step-desc">Panels, reading order and guides on a real spread editor. Reshape, resize, reorder.</div>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step-head"><span class="step-n">05</span><span class="step-price">per panel</span></div>
+      <img class="step-shot" src="images/step-05-final.webp" alt="A finished, lettered two-page spread" loading="lazy">
+      <div class="step-body">
+        <div class="step-title">Final spread</div>
+        <div class="step-desc">Pencils to review, finals to letter, then publish to web, print and reader files.</div>
+      </div>
+    </article>
+  </div>
+
+  <section class="promises">
+    <div class="promise">
+      <h2>Nothing is drawn without you</h2>
+      <p>Style, cast, costumes, props and sets are designed once, approved by you, and kept on-model across every page. The engine never invents a character it hasn't met.</p>
+    </div>
+    <div class="promise">
+      <h2>Every button says its price</h2>
+      <p>Writing, layout and lettering are free. Art is priced per panel and estimated before it runs — with a ceiling you set and a monthly limit nobody else can raise.</p>
+    </div>
+    <div class="promise">
+      <h2>Publish where readers are</h2>
+      <p>A hosted web reader, a print-ready PDF and CBZ/EPUB files from the same pages — preflighted so nothing embarrassing ships.</p>
+    </div>
+  </section>
+
+  <section class="pledge">
+    <span><b>We never train on your work.</b> Not your art, not your scripts, not your characters.</span>
+    <span><b>We never sell your name.</b> The newsletter is opt-in, one click to leave, and a sponsor buys a slot in it — never anything about you.</span>
+  </section>
+
+  <footer class="foot">
+    <span>© 2026 Bang Bam Boom · bangbamboom.com</span>
+    <span>Terms · Privacy · Content policy</span>
+  </footer>
+
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   Waitlist — Clerk, client-side only. No backend, no secret key.
+   The publishable key (pk_...) is designed to sit in page source.
+   NEVER put a secret key (sk_...) in this file.
+------------------------------------------------------------------ */
+const CLERK_PUBLISHABLE_KEY = 'pk_test_Y2VydGFpbi1zd2luZS04MTAxLmNsZXJrLmFjY291bnRzLmRldiQ';
+
+const appearance = {
+  variables: {
+    colorPrimary: '#F07020',
+    colorBackground: '#1C1814',
+    colorText: '#EFE9E0',
+    colorTextSecondary: '#A99E90',
+    colorInputBackground: '#241F19',
+    colorInputText: '#EFE9E0',
+    colorDanger: '#F07020',
+    // Clerk 6 renamed several of these; setting both spellings costs
+    // nothing and keeps the panel correct across the majors.
+    colorForeground: '#EFE9E0',
+    colorMuted: '#241F19',
+    colorMutedForeground: '#A99E90',
+    colorInput: '#241F19',
+    colorInputForeground: '#EFE9E0',
+    colorBorder: '#322B22',
+    colorRing: '#F07020',
+    colorPrimaryForeground: '#14110E',
+    colorModalBackground: '#1C1814',
+    // Clerk derives muted text, borders and dividers from colorNeutral —
+    // not from colorText. Left at its black default, everything derived
+    // renders black-on-black on this ground.
+    colorNeutral: '#EFE9E0',
+    borderRadius: '0px',
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  },
+};
+
+const loadScript = (src, attrs = {}) => new Promise((resolve, reject) => {
+  const s = document.createElement('script');
+  s.src = src;
+  s.async = true;
+  s.crossOrigin = 'anonymous';
+  for (const [k, v] of Object.entries(attrs)) s.setAttribute(k, v);
+  s.onload = resolve;
+  s.onerror = () => reject(new Error('failed to load ' + src));
+  document.head.appendChild(s);
+});
+
+// The frontend API host is base64 in the key's middle segment.
+const frontendApi = (key) => atob(key.split('_')[2]).replace(/\$$/, '');
+
+let clerkReady = null;
+function startClerk() {
+  if (clerkReady) return clerkReady;
+  const fapi = frontendApi(CLERK_PUBLISHABLE_KEY);
+  clerkReady = (async () => {
+    await loadScript(`https://${fapi}/npm/@clerk/ui@1/dist/ui.browser.js`);
+    await loadScript(`https://${fapi}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`, {
+      'data-clerk-publishable-key': CLERK_PUBLISHABLE_KEY,
+    });
+    await Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor }, appearance });
+  })();
+  return clerkReady;
+}
+
+const intro = document.getElementById('gate-intro');
+const mount = document.getElementById('waitlist');
+const done = document.getElementById('gate-done');
+const fallback = document.getElementById('gate-fallback');
+const openBtn = document.getElementById('gate-open');
+
+/* Clerk's waitlist has no success callback, so watch the mount: once the
+   email field has been rendered and then disappears while the mount still
+   has content, the join succeeded. The settle delay avoids firing on the
+   transient loading state between submit and confirmation. */
+function watchForSuccess() {
+  const emailField = () => mount.querySelector('input[type="email"], input[name="emailAddress"]');
+  let sawField = false;
+  let timer = null;
+  const observer = new MutationObserver(() => {
+    if (emailField()) { sawField = true; clearTimeout(timer); return; }
+    if (!sawField) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (emailField() || !mount.textContent.trim()) return;
+      observer.disconnect();
+      mount.hidden = true;
+      done.hidden = false;
+    }, 800);
+  });
+  observer.observe(mount, { childList: true, subtree: true });
+}
+
+openBtn.addEventListener('click', async () => {
+  openBtn.disabled = true;
+  openBtn.textContent = 'Loading…';
+  try {
+    await startClerk();
+    intro.hidden = true;
+    mount.hidden = false;
+    Clerk.mountWaitlist(mount, { appearance });
+    watchForSuccess();
+  } catch (err) {
+    console.error(err);
+    openBtn.disabled = false;
+    openBtn.textContent = 'Create a new account';
+    fallback.hidden = false;
+  }
+});
+</script>
+</body>
+</html>
