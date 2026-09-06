@@ -218,7 +218,7 @@ h1 .sub{color:var(--accent);font-weight:600}
 
   <div class="gate" id="join">
     <div class="gate-inner">
-      <div class="gate-title">Want early access?</div>
+      <div class="gate-title" id="gate-title">Want early access?</div>
 
       <!-- Intro + button. Clicking the button reveals the Clerk waitlist form
            in place; this block is then hidden. -->
@@ -376,6 +376,7 @@ const mount = document.getElementById('waitlist');
 const done = document.getElementById('gate-done');
 const fallback = document.getElementById('gate-fallback');
 const openBtn = document.getElementById('gate-open');
+const title = document.getElementById('gate-title');
 
 /* Clerk's waitlist has no success callback, so watch the mount: once the
    email field has been rendered and then disappears while the mount still
@@ -383,7 +384,9 @@ const openBtn = document.getElementById('gate-open');
    transient loading state between submit and confirmation. */
 function watchForSuccess() {
   const emailField = () => mount.querySelector('input[type="email"], input[name="emailAddress"]');
-  let sawField = false;
+  // Seed from the current DOM: if Clerk rendered synchronously the field is
+  // already there and no mutation will ever announce its arrival.
+  let sawField = !!emailField();
   let timer = null;
   const observer = new MutationObserver(() => {
     if (emailField()) { sawField = true; clearTimeout(timer); return; }
@@ -394,6 +397,8 @@ function watchForSuccess() {
       observer.disconnect();
       mount.hidden = true;
       done.hidden = false;
+      // The heading is still asking a question the visitor has now answered.
+      title.textContent = 'KaBoom!';
     }, 800);
   });
   observer.observe(mount, { childList: true, subtree: true });
@@ -406,8 +411,9 @@ openBtn.addEventListener('click', async () => {
     await startClerk();
     intro.hidden = true;
     mount.hidden = false;
-    Clerk.mountWaitlist(mount, { appearance });
+    // Watch before mounting, so a synchronous render can't slip past.
     watchForSuccess();
+    Clerk.mountWaitlist(mount, { appearance });
   } catch (err) {
     console.error(err);
     openBtn.disabled = false;
