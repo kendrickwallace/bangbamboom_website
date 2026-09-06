@@ -114,9 +114,13 @@ h1 .sub{color:var(--accent);font-weight:600}
   background:var(--ground);min-width:0;
   display:grid;grid-row:span 2;grid-template-rows:subgrid;
 }
+/* No fixed box: each screenshot keeps its own shape, capped in height and
+   flush under the caption, so nothing is letterboxed above the image. The
+   shots run portrait and landscape, so the slack that remains falls at the
+   bottom of the shorter cards rather than above every one of them. */
 .step-shot{
-  aspect-ratio:3/4;background:var(--field);
-  display:block;width:100%;height:100%;object-fit:contain;
+  display:block;width:100%;height:auto;max-height:300px;
+  margin-inline:auto;align-self:start;background:var(--field);
 }
 .step-body{
   padding:14px;display:flex;flex-direction:column;gap:6px;
@@ -168,7 +172,7 @@ h1 .sub{color:var(--accent);font-weight:600}
   .domain{display:none}
   .hero-mark{width:180px}
   .steps{grid-template-columns:1fr;margin-bottom:32px}
-  .step-shot{aspect-ratio:4/3}
+  .step-shot{max-height:420px}
   .gate{padding:32px var(--pad)}
 }
 
