@@ -60,6 +60,10 @@ then open <http://localhost:8123>. There is nothing to build or install.
   them, so they must be styled with global rules.
 - **Appearance variable names moved between Clerk majors.** Both spellings are
   set, and the input is also painted directly in CSS as a backstop.
+- **Never give `.step-shot` an explicit `width`.** With a definite width,
+  `max-height` clamps the height without recomputing the width, and the
+  screenshots render squashed. Both dimensions stay `auto`, bounded by
+  `max-width` / `max-height`, so the intrinsic ratio is always preserved.
 - **Headless Chrome clamps the viewport to 500px minimum.** A screenshot
   requested narrower renders at 500 and is cropped — that looks exactly like a
   horizontal-overflow bug and is not one.
