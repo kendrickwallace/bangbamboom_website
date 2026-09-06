@@ -103,17 +103,25 @@ h1 .sub{color:var(--accent);font-weight:600}
 /* ---------- five steps ---------- */
 .steps{
   display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-auto-rows:auto;
   gap:2px;background:var(--rule);border:2px solid var(--rule);
   margin:0 var(--pad) 48px;
 }
-.step{background:var(--ground);display:flex;flex-direction:column;min-width:0}
-.step-head{
-  display:flex;align-items:center;
-  padding:12px 14px;border-bottom:1px solid var(--rule);
+/* Each card spans the caption row and the image row, and borrows those two
+   rows from the parent grid — so the captions stay one height and the images
+   all start on the same line, however long the copy is. */
+.step{
+  background:var(--ground);min-width:0;
+  display:grid;grid-row:span 2;grid-template-rows:subgrid;
 }
-.step-n{font:700 12px var(--mono);color:var(--accent)}
-.step-shot{aspect-ratio:3/4;background:var(--field);display:block;width:100%;object-fit:contain}
-.step-body{padding:14px;display:flex;flex-direction:column;gap:6px}
+.step-shot{
+  aspect-ratio:3/4;background:var(--field);
+  display:block;width:100%;height:100%;object-fit:contain;
+}
+.step-body{
+  padding:14px;display:flex;flex-direction:column;gap:6px;
+  background:var(--ground);
+}
 .step-title{font:600 15px var(--sans);color:var(--accent)}
 .step-desc{font-size:12.5px;line-height:1.45;color:var(--muted);text-wrap:pretty}
 
@@ -232,44 +240,39 @@ h1 .sub{color:var(--accent);font-weight:600}
 
   <div class="steps">
     <article class="step">
-      <div class="step-head"><span class="step-n">01</span></div>
-      <img class="step-shot" src="images/step-01-script.webp" alt="The script editor, with a page-and-panel breakdown alongside the script" loading="lazy">
       <div class="step-body">
         <div class="step-title">Concept to Script</div>
         <div class="step-desc">A one-line idea becomes a bible, a cast and a 24-page script you can edit line by line.</div>
       </div>
+      <img class="step-shot" src="images/step-01-script.webp" alt="The script editor, with a page-and-panel breakdown alongside the script" loading="lazy">
     </article>
     <article class="step">
-      <div class="step-head"><span class="step-n">02</span></div>
-      <img class="step-shot" src="images/step-02-style.webp" alt="A style candidate: a character rendered in the approved look" loading="lazy">
       <div class="step-body">
         <div class="step-title">Production Design</div>
         <div class="step-desc">Describe the look in plain words. Pick from candidates until the style holds across the whole book.</div>
       </div>
+      <img class="step-shot" src="images/step-02-style.webp" alt="A style candidate: a character rendered in the approved look" loading="lazy">
     </article>
     <article class="step">
-      <div class="step-head"><span class="step-n">03</span></div>
-      <img class="step-shot" src="images/step-03-character.webp" alt="A character model sheet: four turnaround views and six expressions" loading="lazy">
       <div class="step-body">
         <div class="step-title">Character Style Sheets</div>
         <div class="step-desc">Every cast member gets an approved model sheet — the reason faces stay the same on page 1 and page 24.</div>
       </div>
+      <img class="step-shot" src="images/step-03-character.webp" alt="A character model sheet: four turnaround views and six expressions" loading="lazy">
     </article>
     <article class="step">
-      <div class="step-head"><span class="step-n">04</span></div>
-      <img class="step-shot" src="images/step-04-layout.webp" alt="The spread editor: panels, reading order and guides across two pages" loading="lazy">
       <div class="step-body">
         <div class="step-title">Panel and Spread Design</div>
         <div class="step-desc">Panels, reading order and guides on a real spread editor. Reshape, resize, reorder.</div>
       </div>
+      <img class="step-shot" src="images/step-04-layout.webp" alt="The spread editor: panels, reading order and guides across two pages" loading="lazy">
     </article>
     <article class="step">
-      <div class="step-head"><span class="step-n">05</span></div>
-      <img class="step-shot" src="images/step-05-final.webp" alt="A finished, lettered two-page spread" loading="lazy">
       <div class="step-body">
         <div class="step-title">Final Panel Art and Lettering</div>
         <div class="step-desc">Pencils to review, finals to letter, then publish to web, print and reader files.</div>
       </div>
+      <img class="step-shot" src="images/step-05-final.webp" alt="A finished, lettered two-page spread" loading="lazy">
     </article>
   </div>
 
