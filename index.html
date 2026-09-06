@@ -52,11 +52,7 @@ a:hover{color:var(--lift)}
 
 /* ---------- hero ---------- */
 .hero{
-  display:grid;grid-template-columns:minmax(0,1.4fr) minmax(320px,400px);
-  border-bottom:2px solid var(--rule);
-}
-.hero-main{
-  padding:56px var(--pad) 48px;border-right:2px solid var(--rule);
+  padding:56px var(--pad) 48px;border-bottom:2px solid var(--rule);
   display:flex;flex-direction:column;align-items:center;gap:32px;
 }
 .hero-mark{width:320px;height:auto;display:block}
@@ -68,10 +64,14 @@ h1 .sub{color:var(--accent);font-weight:600}
 
 /* ---------- waitlist panel ---------- */
 .gate{
-  padding:48px 40px;background:var(--panel);
-  display:flex;flex-direction:column;justify-content:center;gap:20px;
-  scroll-margin-top:16px;
-  min-width:0;overflow:hidden;
+  padding:40px var(--pad);background:var(--panel);
+  border-bottom:2px solid var(--rule);scroll-margin-top:16px;
+}
+/* The band is full width; its contents stay a readable column on the
+   page's centre line, the same centre the hero and standfirst use. */
+.gate-inner{
+  max-width:420px;margin:0 auto;min-width:0;overflow:hidden;
+  display:flex;flex-direction:column;gap:20px;
 }
 .gate-title{font:600 22px/1.2 var(--sans);color:var(--accent);text-align:center}
 .gate-lede{font-size:17px;line-height:1.45;color:var(--ink);text-align:center;text-wrap:pretty}
@@ -146,11 +146,9 @@ h1 .sub{color:var(--accent);font-weight:600}
 @media (max-width:1080px){
   :root{--pad:32px}
   .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .hero{grid-template-columns:minmax(0,1fr) minmax(300px,360px)}
 }
 @media (max-width:900px){
-  .hero{grid-template-columns:1fr}
-  .hero-main{border-right:0;border-bottom:2px solid var(--rule);padding-top:40px}
+  .hero{padding-top:40px}
   .hero-mark{width:240px}
   .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
   .promise{border-right:0;border-bottom:1px solid var(--rule)}
@@ -163,7 +161,7 @@ h1 .sub{color:var(--accent);font-weight:600}
   .hero-mark{width:180px}
   .steps{grid-template-columns:1fr;margin-bottom:32px}
   .step-shot{aspect-ratio:4/3}
-  .gate{padding:32px 24px}
+  .gate{padding:32px var(--pad)}
   .foot{justify-content:center;text-align:center}
 }
 
@@ -198,12 +196,12 @@ h1 .sub{color:var(--accent);font-weight:600}
   </header>
 
   <div class="hero">
-    <div class="hero-main">
-      <img class="hero-mark" src="images/logo-512.png" alt="" width="512" height="512">
-      <h1>Write it. Design it. Create it.<br><span class="sub">Your style, your story, your pages.</span></h1>
-    </div>
+    <img class="hero-mark" src="images/logo-512.png" alt="" width="512" height="512">
+    <h1>Write it. Design it. Create it.<br><span class="sub">Your style, your story, your pages.</span></h1>
+  </div>
 
-    <div class="gate" id="join">
+  <div class="gate" id="join">
+    <div class="gate-inner">
       <div class="gate-title">Want early access?</div>
 
       <!-- Intro + button. Clicking the button reveals the Clerk waitlist form
