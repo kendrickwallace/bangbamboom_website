@@ -56,6 +56,28 @@ for old, new in [
     assert old in s, f'reader template changed; no match for: {old[:48]}'
     s = s.replace(old, new)
 
+# The leaf's two halves are separately composited 3D layers, so a sub-pixel
+# gap opens where they meet, showing the dark page through as a hairline down
+# the turning page — most visible on a bright page over an empty slot.
+# Bleeding the inner half one pixel under the outer closes it; the extra pixel
+# is the same image content the outer half starts with, so nothing shifts.
+# (Worth fixing upstream in the app's reader export too.)
+seam = [
+ ("function face(s,back){const d=div('face'+(back?' back':''));if(s)d.append(pic(s));return d}",
+  "function face(s,back,shift){const d=div('face'+(back?' back':''));"
+  "if(s){const p=pic(s);if(shift)p.style.left=(parseFloat(p.style.left)+shift)+'px';d.append(p)}return d}"),
+ ("function half(left,front,back){const h=div('half');h.style.left=left+'px';"
+  "h.style.width=(pw/2)+'px';h.append(face(front,false),face(back,true));return h}",
+  "function half(left,front,back,bleed){const h=div('half');const b=bleed||0,sh=b<0?1:0;"
+  "h.style.left=(left-sh)+'px';h.style.width=((pw/2)+(b?1:0))+'px';"
+  "h.append(face(front,false,sh),face(back,true,sh));return h}"),
+ ("const inner=half(fwd?0:q,sub(front,fwd),sub(back,!fwd));",
+  "const inner=half(fwd?0:q,sub(front,fwd),sub(back,!fwd),fwd?1:-1);"),
+]
+for old, new in seam:
+    assert old in s, f'reader changed; seam fix no longer applies: {old[:44]}'
+    s = s.replace(old, new)
+
 # Public title instead of the internal slug and release number.
 import re
 s = re.sub(r'<title>.*?</title>',

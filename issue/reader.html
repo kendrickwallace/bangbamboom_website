@@ -49,8 +49,8 @@ function settle(){label.textContent=P[i].label;count.textContent=(i+1)+' / '+P.l
 const DUR=800;
 // Half of a slot's slice: the inner half (lo) or the outer.
 const sub=(s,lo)=>{if(!s)return null;const mid=(s.x0+s.x1)/2;return{...s,x0:lo?s.x0:mid,x1:lo?mid:s.x1}};
-function face(s,back){const d=div('face'+(back?' back':''));if(s)d.append(pic(s));return d}
-function half(left,front,back){const h=div('half');h.style.left=left+'px';h.style.width=(pw/2)+'px';h.append(face(front,false),face(back,true));return h}
+function face(s,back,shift){const d=div('face'+(back?' back':''));if(s){const p=pic(s);if(shift)p.style.left=(parseFloat(p.style.left)+shift)+'px';d.append(p)}return d}
+function half(left,front,back,bleed){const h=div('half');const b=bleed||0,sh=b<0?1:0;h.style.left=(left-sh)+'px';h.style.width=((pw/2)+(b?1:0))+'px';h.append(face(front,false,sh),face(back,true,sh));return h}
 function turn(from,to,fwd,done){
   const A=slots(from),B=slots(to),q=pw/2;
   flip.hidden=false;flip.innerHTML='';
@@ -62,7 +62,7 @@ function turn(from,to,fwd,done){
   // The leaf: hinged at the spine, its outer half hinged at the leaf's own middle, so the free edge leads.
   const leaf=div('leaf');leaf.style.left=(fwd?pw:0)+'px';leaf.style.width=pw+'px';leaf.style.transformOrigin=fwd?'left center':'right center';
   const front=fwd?A.r:A.l,back=fwd?B.l:B.r;
-  const inner=half(fwd?0:q,sub(front,fwd),sub(back,!fwd));
+  const inner=half(fwd?0:q,sub(front,fwd),sub(back,!fwd),fwd?1:-1);
   const outer=half(fwd?q:0,sub(front,!fwd),sub(back,fwd));
   outer.style.transformOrigin=fwd?'left center':'right center';
   const ls=div('shade');leaf.append(inner,outer,ls);flip.append(cover,leaf);
