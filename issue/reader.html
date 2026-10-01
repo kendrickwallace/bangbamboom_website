@@ -42,15 +42,15 @@ const div=(c)=>{const d=document.createElement('div');d.className=c;return d};
 function slots(k){const p=P[k];if(p.pages>1)return{l:{src:p.src,x0:0,x1:.5,two:true},r:{src:p.src,x0:.5,x1:1,two:true}};
   const one={src:p.src,x0:0,x1:1,two:false};const onLeft=p.kind==='back'||(k===P.length-1&&k>0);return onLeft?{l:one,r:null}:{l:null,r:one}}
 // A picture showing the slice [x0,x1] of its source, the source drawn at the book's scale.
-function pic(s){const im=new Image();im.src=s.src;const Ws=s.two?2*pw:pw;im.style.width=Ws+'px';im.style.height=ph+'px';im.style.left=(-s.x0*Ws)+'px';return im}
+function pic(s,dx){const im=new Image();im.src=s.src;const Ws=s.two?2*pw:pw;im.style.width=Ws+'px';im.style.height=ph+'px';im.style.left=(-s.x0*Ws+(dx||0))+'px';return im}
 function paint(k){const s=slots(k);for(const side of ['l','r']){const slot=book.querySelector('.slot.'+side);slot.innerHTML='';const v=s[side];slot.classList.toggle('has',!!v);if(v)slot.append(pic(v))}}
-function layout(){const w=innerWidth-24,h=innerHeight-68;ph=Math.min(h,(w/2)/ASPECT);pw=ph*ASPECT;book.style.width=(2*pw)+'px';book.style.height=ph+'px';if(shown&&!turning)paint(i)}
+function layout(){const w=innerWidth-24,h=innerHeight-68;pw=Math.floor(Math.min(h,(w/2)/ASPECT)*ASPECT);pw-=pw%2;ph=pw/ASPECT;book.style.width=(2*pw)+'px';book.style.height=ph+'px';if(shown&&!turning)paint(i)}
 function settle(){label.textContent=P[i].label;count.textContent=(i+1)+' / '+P.length;prev.disabled=i===0;next.disabled=i===P.length-1;history.replaceState(null,'','#'+(i+1));load(i+1);load(i+2);load(i-1)}
 const DUR=800;
 // Half of a slot's slice: the inner half (lo) or the outer.
 const sub=(s,lo)=>{if(!s)return null;const mid=(s.x0+s.x1)/2;return{...s,x0:lo?s.x0:mid,x1:lo?mid:s.x1}};
-function face(s,back,shift){const d=div('face'+(back?' back':''));if(s){const p=pic(s);if(shift)p.style.left=(parseFloat(p.style.left)+shift)+'px';d.append(p)}return d}
-function half(left,front,back,bleed){const h=div('half');const b=bleed||0,sh=b<0?1:0;h.style.left=(left-sh)+'px';h.style.width=((pw/2)+(b?1:0))+'px';h.append(face(front,false,sh),face(back,true,sh));return h}
+function face(s,back,dx){const d=div('face'+(back?' back':''));if(s)d.append(pic(s,dx));return d}
+function half(left,w,front,back,fdx,bdx){const h=div('half');h.style.left=left+'px';h.style.width=w+'px';h.append(face(front,false,fdx),face(back,true,bdx));return h}
 function turn(from,to,fwd,done){
   const A=slots(from),B=slots(to),q=pw/2;
   flip.hidden=false;flip.innerHTML='';
@@ -62,8 +62,8 @@ function turn(from,to,fwd,done){
   // The leaf: hinged at the spine, its outer half hinged at the leaf's own middle, so the free edge leads.
   const leaf=div('leaf');leaf.style.left=(fwd?pw:0)+'px';leaf.style.width=pw+'px';leaf.style.transformOrigin=fwd?'left center':'right center';
   const front=fwd?A.r:A.l,back=fwd?B.l:B.r;
-  const inner=half(fwd?0:q,sub(front,fwd),sub(back,!fwd),fwd?1:-1);
-  const outer=half(fwd?q:0,sub(front,!fwd),sub(back,fwd));
+  const inner=fwd?half(0,q+1,sub(front,true),sub(back,false),0,1):half(q-1,q+1,sub(front,false),sub(back,true),1,0);
+  const outer=half(fwd?q:0,q,sub(front,!fwd),sub(back,fwd),0,0);
   outer.style.transformOrigin=fwd?'left center':'right center';
   const ls=div('shade');leaf.append(inner,outer,ls);flip.append(cover,leaf);
   const ease='cubic-bezier(.42,.05,.28,1)',sign=fwd?-1:1;
