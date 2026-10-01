@@ -130,6 +130,53 @@ h1 .sub{color:var(--accent);font-weight:600}
 .step-title{font:600 15px var(--sans);color:var(--accent)}
 .step-desc{font-size:12.5px;line-height:1.45;color:var(--muted);text-wrap:pretty}
 
+/* ---------- published issue ---------- */
+.issue{
+  padding:28px var(--pad);border-bottom:2px solid var(--rule);
+  display:flex;justify-content:center;
+}
+.issue-inner{
+  display:flex;gap:28px;align-items:center;
+  max-width:720px;width:100%;
+}
+.issue-cover{
+  /* height:auto is load-bearing: the img's height attribute is a
+     presentational hint and would otherwise set the height outright,
+     stretching the cover. */
+  width:180px;height:auto;flex:none;display:block;
+  border:1px solid var(--rule);background:var(--field);
+}
+.issue-text{display:flex;flex-direction:column;gap:8px;min-width:0}
+.issue-kicker{
+  font:500 11px var(--mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);
+}
+.issue-title{font:600 19px/1.25 var(--sans);text-wrap:balance}
+.issue-meta{font:11px var(--mono);color:var(--dim)}
+.issue-blurb{font-size:13px;line-height:1.5;color:var(--muted);text-wrap:pretty}
+.issue-cta{
+  margin-top:6px;align-self:start;height:40px;display:inline-flex;
+  align-items:center;justify-content:center;padding:0 22px;
+  border:1px solid var(--accent);background:none;color:var(--accent);
+  font:600 13px var(--sans);letter-spacing:.08em;cursor:pointer;
+}
+.issue-cta:hover{background:var(--accent);color:var(--ground)}
+
+/* ---------- reader overlay ---------- */
+.reader{
+  position:fixed;inset:0;z-index:100;background:var(--ground);
+  display:flex;flex-direction:column;
+}
+.reader[hidden]{display:none}
+.reader iframe{flex:1;width:100%;border:0;display:block}
+.reader-close{
+  position:absolute;top:10px;right:12px;z-index:2;
+  height:32px;padding:0 14px;border:1px solid var(--rule);
+  background:var(--panel);color:var(--ink);
+  font:600 12px var(--sans);cursor:pointer;
+}
+.reader-close:hover{background:var(--accent);color:var(--ground);border-color:var(--accent)}
+
 /* ---------- promises ---------- */
 .promises{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -174,6 +221,8 @@ h1 .sub{color:var(--accent);font-weight:600}
   .steps{grid-template-columns:1fr;margin-bottom:32px}
   .step-shot{max-height:420px}
   .gate{padding:16px var(--pad) 28px}
+  .issue-inner{flex-direction:column;text-align:center;gap:18px}
+  .issue-cta{align-self:center}
 }
 
 /* ---------- Clerk overrides ----------
@@ -280,6 +329,19 @@ h1 .sub{color:var(--accent);font-weight:600}
     </article>
   </div>
 
+  <section class="issue">
+    <div class="issue-inner">
+      <img class="issue-cover" src="images/issue-1-cover.webp" alt="Cover of Victoria Clarke and the Galton Conspiracy, Issue 1" width="520" height="790" loading="lazy">
+      <div class="issue-text">
+        <div class="issue-kicker">Made with Bang Bam Boom</div>
+        <div class="issue-title">Victoria Clarke and the Galton Conspiracy</div>
+        <div class="issue-meta">Issue 1 · 20 pages</div>
+        <div class="issue-blurb">Written, designed, drawn and lettered in the browser — start to finish, nothing drawn without approval. Read the first published issue.</div>
+        <button class="issue-cta" id="read-now" type="button">READ NOW</button>
+      </div>
+    </div>
+  </section>
+
   <section class="promises">
     <div class="promise">
       <h2>Nothing is drawn without you</h2>
@@ -304,6 +366,11 @@ h1 .sub{color:var(--accent);font-weight:600}
     <span>© 2026 Ken Wallace Films Inc. · bangbamboom.com</span>
   </footer>
 
+</div>
+
+<div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-label="Victoria Clarke and the Galton Conspiracy, Issue 1">
+  <button class="reader-close" id="reader-close" type="button">Close ✕</button>
+  <iframe id="reader-frame" title="Comic reader" allowfullscreen></iframe>
 </div>
 
 <script>
@@ -421,6 +488,37 @@ openBtn.addEventListener('click', async () => {
     fallback.hidden = false;
   }
 });
+/* ------------------------------------------------------------------
+   The published issue, read in an overlay.
+   The reader and its ~5MB of pages are only fetched on the first open,
+   so the landing page itself stays light. The frame is kept afterwards,
+   so reopening is instant and returns to the page you were on.
+------------------------------------------------------------------ */
+const reader = document.getElementById('reader');
+const readerFrame = document.getElementById('reader-frame');
+let lastFocus = null;
+
+function openReader() {
+  if (!readerFrame.src) readerFrame.src = 'issue/reader.html';
+  lastFocus = document.activeElement;
+  reader.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('reader-close').focus();
+}
+
+function closeReader() {
+  if (reader.hidden) return;
+  reader.hidden = true;
+  document.body.style.overflow = '';
+  if (lastFocus) lastFocus.focus();
+}
+
+document.getElementById('read-now').addEventListener('click', openReader);
+document.getElementById('reader-close').addEventListener('click', closeReader);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeReader(); });
+// Escape pressed inside the frame can't reach this document directly.
+window.addEventListener('message', (e) => { if (e.data === 'close-reader') closeReader(); });
+
 </script>
 </body>
 </html>

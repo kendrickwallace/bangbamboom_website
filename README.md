@@ -32,6 +32,28 @@ Every logo size in `images/` is resampled from the alpha master. Always derive
 from it — the flat version without alpha has hard binary edges and looks
 stamped-out at small sizes.
 
+## The published issue
+
+`issue/reader.html` is the page-turn reader the app exports, adapted here:
+paths repointed at WebP, repainted in the site palette, and taught to
+`postMessage` on Escape so the overlay can close. `images/issue-1-cover.webp`
+is the thumbnail on the landing page.
+
+The reader and its ~5MB of pages load **only when READ NOW is pressed** — the
+iframe has no `src` until then, so the landing page stays around 600KB.
+
+To publish a new release, point the build script at the app's export
+directory:
+
+    tools/build-issue.sh ~/Home/layout-lab/exports/issue-steam-powered-1/publish/release-N
+
+It resizes every page (spreads to 2000px, singles to 1000px, so each page is
+one height), rebuilds the cover thumbnail, and re-applies the reader edits
+above. 27MB of JPEG becomes about 5.5MB of WebP at no visible cost to the
+lettering. The script asserts on each reader edit, so if a future export
+changes the reader template it fails loudly rather than shipping a
+half-styled reader.
+
 ## Going live
 
 1. Create the Clerk **production** instance and swap `CLERK_PUBLISHABLE_KEY` in
