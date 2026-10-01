@@ -56,43 +56,8 @@ for old, new in [
     assert old in s, f'reader template changed; no match for: {old[:48]}'
     s = s.replace(old, new)
 
-# Seam fix, ported from the app's own in-app reader (src/editor/server.ts).
-# The exported reader does not yet carry it, so it is re-applied here on every
-# build. Two parts:
-#   1. layout() rounds the page to a whole, even number of pixels, so the two
-#      halves of the leaf and the two slots meet on exact pixel edges instead
-#      of fractional ones. This removes the cause rather than hiding it.
-#   2. The inner half runs one pixel under the outer's hinge, showing the same
-#      column of the picture, so the seam where the outer half bends never
-#      opens to the ground beneath. The back face is mirrored about the half's
-#      own middle, so widening it moves its picture — shifted back by the same
-#      pixel via the fdx/bdx offsets.
-# Drop this block once an export ships with the fix (the asserts will fire).
-seam = [
- ("function pic(s){const im=new Image();im.src=s.src;const Ws=s.two?2*pw:pw;"
-  "im.style.width=Ws+'px';im.style.height=ph+'px';im.style.left=(-s.x0*Ws)+'px';return im}",
-  "function pic(s,dx){const im=new Image();im.src=s.src;const Ws=s.two?2*pw:pw;"
-  "im.style.width=Ws+'px';im.style.height=ph+'px';im.style.left=(-s.x0*Ws+(dx||0))+'px';return im}"),
- ("function layout(){const w=innerWidth-24,h=innerHeight-68;ph=Math.min(h,(w/2)/ASPECT);"
-  "pw=ph*ASPECT;book.style.width=(2*pw)+'px';book.style.height=ph+'px';if(shown&&!turning)paint(i)}",
-  "function layout(){const w=innerWidth-24,h=innerHeight-68;"
-  "pw=Math.floor(Math.min(h,(w/2)/ASPECT)*ASPECT);pw-=pw%2;ph=pw/ASPECT;"
-  "book.style.width=(2*pw)+'px';book.style.height=ph+'px';if(shown&&!turning)paint(i)}"),
- ("function face(s,back){const d=div('face'+(back?' back':''));if(s)d.append(pic(s));return d}",
-  "function face(s,back,dx){const d=div('face'+(back?' back':''));if(s)d.append(pic(s,dx));return d}"),
- ("function half(left,front,back){const h=div('half');h.style.left=left+'px';"
-  "h.style.width=(pw/2)+'px';h.append(face(front,false),face(back,true));return h}",
-  "function half(left,w,front,back,fdx,bdx){const h=div('half');h.style.left=left+'px';"
-  "h.style.width=w+'px';h.append(face(front,false,fdx),face(back,true,bdx));return h}"),
- ("const inner=half(fwd?0:q,sub(front,fwd),sub(back,!fwd));",
-  "const inner=fwd?half(0,q+1,sub(front,true),sub(back,false),0,1)"
-  ":half(q-1,q+1,sub(front,false),sub(back,true),1,0);"),
- ("const outer=half(fwd?q:0,sub(front,!fwd),sub(back,fwd));",
-  "const outer=half(fwd?q:0,q,sub(front,!fwd),sub(back,fwd),0,0);"),
-]
-for old, new_ in seam:
-    assert old in s, f'reader changed; seam fix no longer applies: {old[:44]}'
-    s = s.replace(old, new_)
+# The seam fix (even-pixel sizing and the overlapped leaf halves) now ships in
+# the export itself, as of release 7. The patch that used to live here is gone.
 
 # Public title instead of the internal slug and release number.
 import re
